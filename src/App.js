@@ -32,6 +32,11 @@ function App() {
       icon: 'fab fa-twitter',
       link: 'https://twitter.com/esauop',
     },
+    {
+      id: 'gmail',
+      icon: 'fas fa-at',
+      link: 'mailto:hola@esauortega.com',
+    },
   ]);
 
   return (
