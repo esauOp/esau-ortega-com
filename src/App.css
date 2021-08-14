@@ -59,7 +59,6 @@ li.sm-icon a {
   cursor: pointer;
   text-decoration: none;
   font-size: var(--font-size--x2);
-
 }
 
 li.sm-icon a,
@@ -94,8 +93,9 @@ a.nav-link {
   transition: 0.2s ease-in;
 }
 
-a.nav-link:link, a.nav-link:visited {
-  color: var(--primary-font--color)
+a.nav-link:link,
+a.nav-link:visited {
+  color: var(--primary-font--color);
 }
 
 a.nav-link:hover {
@@ -157,4 +157,41 @@ a.nav-link:hover {
   100% {
     background-color: #ccc;
   }
+}
+
+/*
+Each breakpoint (a key) matches with a fixed screen width (a value):
+
+xs, extra-small: 0px
+sm, small: 600px
+md, medium: 960px
+lg, large: 1280px
+xl, extra-large: 1920px
+*/
+
+/* Extra small devices (phones, 600px and down) */
+@media only screen and (max-width: 600px) {
+  footer {
+    text-align: center;
+  }
+
+  li.sm-icon:first-child {
+    margin-left: 0px;
+  }
+}
+
+/* Small devices (portrait tablets and large phones, 600px and up) */
+@media only screen and (min-width: 600px) {
+}
+
+/* Medium devices (landscape tablets, 768px and up) */
+@media only screen and (min-width: 768px) {
+}
+
+/* Large devices (laptops/desktops, 992px and up) */
+@media only screen and (min-width: 992px) {
+}
+
+/* Extra large devices (large laptops and desktops, 1200px and up) */
+@media only screen and (min-width: 1200px) {
 }
