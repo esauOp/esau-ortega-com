@@ -1,0 +1,128 @@
+---
+export interface Props {
+	animation?: 'fadeIn' | 'slideUp' | 'slideLeft' | 'slideRight' | 'scaleIn' | 'stagger';
+	delay?: number;
+	duration?: number;
+	className?: string;
+}
+
+const { 
+	animation = 'fadeIn', 
+	delay = 0, 
+	duration = 0.6, 
+	className = '' 
+} = Astro.props;
+
+const animationVariants = {
+	fadeIn: {
+		initial: { opacity: 0 },
+		animate: { opacity: 1 },
+		exit: { opacity: 0 }
+	},
+	slideUp: {
+		initial: { opacity: 0, y: 50 },
+		animate: { opacity: 1, y: 0 },
+		exit: { opacity: 0, y: -50 }
+	},
+	slideLeft: {
+		initial: { opacity: 0, x: 50 },
+		animate: { opacity: 1, x: 0 },
+		exit: { opacity: 0, x: -50 }
+	},
+	slideRight: {
+		initial: { opacity: 0, x: -50 },
+		animate: { opacity: 1, x: 0 },
+		exit: { opacity: 0, x: 50 }
+	},
+	scaleIn: {
+		initial: { opacity: 0, scale: 0.8 },
+		animate: { opacity: 1, scale: 1 },
+		exit: { opacity: 0, scale: 0.8 }
+	},
+	stagger: {
+		initial: { opacity: 0, y: 20 },
+		animate: { opacity: 1, y: 0 },
+		exit: { opacity: 0, y: -20 }
+	}
+};
+
+const selectedVariant = animationVariants[animation];
+---
+
+<div class={`animated-section ${className}`} data-animation={animation} data-delay={delay} data-duration={duration}>
+	<slot />
+</div>
+
+<style>
+	.animated-section {
+		opacity: 0;
+		transform: translateY(50px);
+		transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+	}
+
+	.animated-section.animate {
+		opacity: 1;
+		transform: translateY(0);
+	}
+
+	.animated-section[data-animation="slideLeft"] {
+		transform: translateX(50px);
+	}
+
+	.animated-section[data-animation="slideLeft"].animate {
+		transform: translateX(0);
+	}
+
+	.animated-section[data-animation="slideRight"] {
+		transform: translateX(-50px);
+	}
+
+	.animated-section[data-animation="slideRight"].animate {
+		transform: translateX(0);
+	}
+
+	.animated-section[data-animation="scaleIn"] {
+		transform: scale(0.8);
+	}
+
+	.animated-section[data-animation="scaleIn"].animate {
+		transform: scale(1);
+	}
+
+	.animated-section[data-animation="fadeIn"] {
+		transform: none;
+	}
+
+	.animated-section[data-animation="fadeIn"].animate {
+		transform: none;
+	}
+</style>
+
+<script>
+	// Intersection Observer para animaciones al hacer scroll
+	const observerOptions = {
+		threshold: 0.1,
+		rootMargin: '0px 0px -50px 0px'
+	};
+
+	const observer = new IntersectionObserver((entries) => {
+		entries.forEach(entry => {
+			if (entry.isIntersecting) {
+				const element = entry.target as HTMLElement;
+				const delay = parseInt(element.dataset.delay || '0') || 0;
+				const duration = parseFloat(element.dataset.duration || '0.6') || 0.6;
+				
+				setTimeout(() => {
+					element.style.transitionDuration = `${duration}s`;
+					element.classList.add('animate');
+				}, delay);
+			}
+		});
+	}, observerOptions);
+
+	// Observar todos los elementos con animación
+	document.addEventListener('DOMContentLoaded', () => {
+		const animatedElements = document.querySelectorAll('.animated-section');
+		animatedElements.forEach((el: Element) => observer.observe(el));
+	});
+</script>

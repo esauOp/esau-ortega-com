@@ -1,0 +1,153 @@
+---
+export interface Props {
+	text: string;
+	animation?: 'typewriter' | 'fadeInUp' | 'slideIn' | 'bounce';
+	delay?: number;
+	className?: string;
+}
+
+const { 
+	text, 
+	animation = 'fadeInUp', 
+	delay = 0, 
+	className = '' 
+} = Astro.props;
+---
+
+<div class={`text-animation text-${animation} ${className}`} data-delay={delay}>
+	{animation === 'typewriter' ? (
+		<span class="typewriter-text" data-text={text}></span>
+	) : (
+		<span class="text-content">{text}</span>
+	)}
+</div>
+
+<style>
+	.text-animation {
+		overflow: hidden;
+	}
+
+	.text-fadeInUp {
+		opacity: 0;
+		transform: translateY(30px);
+		transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+	}
+
+	.text-fadeInUp.animate {
+		opacity: 1;
+		transform: translateY(0);
+	}
+
+	.text-slideIn {
+		opacity: 0;
+		transform: translateX(-50px);
+		transition: all 0.6s ease;
+	}
+
+	.text-slideIn.animate {
+		opacity: 1;
+		transform: translateX(0);
+	}
+
+	.text-bounce {
+		opacity: 0;
+		transform: translateY(-20px);
+		transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+	}
+
+	.text-bounce.animate {
+		opacity: 1;
+		transform: translateY(0);
+	}
+
+	/* Efecto de máquina de escribir */
+	.typewriter-text {
+		display: inline-block;
+		border-right: 2px solid #3b82f6;
+		white-space: nowrap;
+		overflow: hidden;
+		animation: typewriter 3s steps(40, end), blink-caret 0.75s step-end infinite;
+	}
+
+	@keyframes typewriter {
+		from { width: 0; }
+		to { width: 100%; }
+	}
+
+	@keyframes blink-caret {
+		from, to { border-color: transparent; }
+		50% { border-color: #3b82f6; }
+	}
+
+	/* Animación de palabras individuales */
+	.text-content {
+		display: inline-block;
+	}
+
+	.text-content span {
+		display: inline-block;
+		opacity: 0;
+		transform: translateY(20px);
+		animation: wordFadeIn 0.6s ease forwards;
+	}
+
+	@keyframes wordFadeIn {
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+</style>
+
+<script>
+	// Función para dividir texto en palabras para animación
+	function splitTextIntoWords(element: HTMLElement) {
+		const text = element.textContent;
+		const words = text?.split(' ') || [];
+		element.innerHTML = words.map((word: string) => `<span>${word}</span>`).join(' ');
+	}
+
+	// Función para animar palabras con delay
+	function animateWords(element: HTMLElement, delay = 100) {
+		const words = element.querySelectorAll('span');
+		words.forEach((word: Element, index: number) => {
+			(word as HTMLElement).style.animationDelay = `${index * delay}ms`;
+		});
+	}
+
+	// Intersection Observer para animaciones de texto
+	const textObserverOptions = {
+		threshold: 0.5,
+		rootMargin: '0px 0px -100px 0px'
+	};
+
+	const textObserver = new IntersectionObserver((entries) => {
+		entries.forEach(entry => {
+			if (entry.isIntersecting) {
+				const element = entry.target as HTMLElement;
+				const delay = parseInt(element.dataset.delay || '0') || 0;
+				
+				setTimeout(() => {
+					element.classList.add('animate');
+					
+					// Si es animación de palabras, dividir el texto
+					if (element.classList.contains('text-fadeInUp') || 
+						element.classList.contains('text-slideIn') || 
+						element.classList.contains('text-bounce')) {
+						const textContent = element.querySelector('.text-content') as HTMLElement;
+						if (textContent) {
+							splitTextIntoWords(textContent);
+							animateWords(textContent, 150);
+						}
+					}
+				}, delay);
+			}
+		});
+	}, textObserverOptions);
+
+	// Observar elementos de texto al cargar
+	document.addEventListener('DOMContentLoaded', () => {
+		const textElements = document.querySelectorAll('.text-animation');
+		textElements.forEach(el => textObserver.observe(el));
+	});
+</script>
